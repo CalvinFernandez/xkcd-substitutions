@@ -121,8 +121,25 @@ function toggleActive() {
     });
 }
 
+function queryReplacements() {
+    chrome.storage.sync.get(null, function(result) {
+        jQuery.ajax({
+            url: result["remoteUrl"],
+            success: function(data) {
+                if (data.replacements != null) {
+                    chrome.storage.sync.set({
+                      "replacements": data.replacements
+                    });
+                }
+            }
+        });
+    });
+}
+
 chrome.browserAction.onClicked.addListener(toggleActive);
 chrome.runtime.onMessage.addListener(addMessage);
 chrome.tabs.onUpdated.addListener(injectionScript);
+chrome.tabs.onUpdated.addListener(queryReplacements);
 chrome.runtime.onInstalled.addListener(fixDataCorruption);
 chrome.runtime.onStartup.addListener(fixDataCorruption);
+chrome.runtime.onStartup.addListener(queryReplacements);
